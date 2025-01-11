@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoBattle Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="landingPage">
+        <h1>Welcome to AutoBattle Game</h1>
+        <button id="startGameButton">Start Game</button>
+    </div>
+    <div id="shopPage" style="display: none;">
+        <h2>Turn <span id="turnNumber">1</span></h2>
+        <p>Lives: <span id="lives">5</span></p>
+        <p>Coins: <span id="coins">10</span></p>
+        <h3>Shop</h3>
+        <div id="shopItems"></div>
+        <button id="nextButton">Next</button>
+    </div>
+    <div id="gameContainer" style="display: none;">
+        <canvas id="gameCanvas" width="500" height="300"></canvas>
+    </div>
+    <script src="js/main.js"></script>
+    <script src="js/shop.js"></script>
+    <script src="js/battle.js"></script>
+    <script src="js/shapes.js"></script>
+</body>
+</html>

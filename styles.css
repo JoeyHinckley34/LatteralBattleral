@@ -1,0 +1,16 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
+
+#landingPage, #shopPage {
+    text-align: center;
+}
+
+canvas {
+    border: 2px solid black;
+}

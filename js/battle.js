@@ -11,8 +11,8 @@ function useShapeAbility(userTeam, opposingTeam) {
     if (currentTurn === 'user') {
         // Example ability: remove a shape from the opposing team
         if (opposingTeam.length > 0) {
-            opposingTeam.pop(); // Remove the last shape from the opposing team
-            console.log("User used ability! Opposing team shape removed.");
+            const removedShape = opposingTeam.pop(); // Remove the last shape from the opposing team
+            console.log("User used ability! Opposing team shape removed: ", removedShape);
         }
         currentTurn = 'opposing'; // Switch turn
     } else {
@@ -29,17 +29,16 @@ function battleLoop() {
     requestAnimationFrame(battleLoop);
 }
 
-// Function to create a random shape for the opposing team
-function createRandomShape() {
-    const shapes = ['circle', 'square', 'triangle']; // Add more shapes as needed
-    return shapes[Math.floor(Math.random() * shapes.length)];
-}
-
 // Create opposing team
 function createOpposingTeam(size) {
     const opposingTeam = [];
     for (let i = 0; i < size; i++) {
-        opposingTeam.push(createRandomShape());
+        // Assuming the new Triangle class takes three sides as parameters
+        const a = 30; 
+        const b = 40; 
+        const c = 50; 
+        const triangle = new Triangle(a, b, c); // Create a new Triangle instance
+        opposingTeam.push(triangle);
     }
     return opposingTeam;
 }
@@ -49,10 +48,8 @@ function displayTeams(userTeam, opposingTeam) {
     // Display user team at the bottom
     console.log("User Team: ", userTeam);
     // Display opposing team at the top
-    console.log("Opposing Team: ", opposingTeam);
+    opposingTeam.forEach(triangle => {
+        console.log("Opposing Team Triangle: ", triangle);
+    });
 }
 
-// Example usage
-const userTeam = ['circle', 'square']; // Example user team
-const opposingTeam = createOpposingTeam(3); // Create opposing team with 3 random shapes
-displayTeams(userTeam, opposingTeam);

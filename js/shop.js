@@ -7,66 +7,36 @@ function loadShop() {
     let shopItemsContainer = document.getElementById("shopItems");
     shopItemsContainer.innerHTML = "";
 
-    let shapes = [
-        "EquilateralTriangle", "IsoscelesTriangle", "ScaleneTriangle",
-        "RightTriangle", "ObtuseTriangle", "AcuteTriangle"
+    // Hard-coded triangles for the shop
+    const triangles = [
+        new Triangle(3, 4, 5),
+        new Triangle(4, 5, 6), 
+        new Triangle(3, 2, 2), 
+        new Triangle(3, 4, 6), 
+        new Triangle(5, 5, 3), 
+        new Triangle(6, 6, 6)  
     ];
-    shapes.forEach(shape => {
-        // Create a div to represent the shape
+
+    triangles.forEach((triangle, index) => {
+        // Create a div to represent the triangle
         let shapeDiv = document.createElement("div");
         shapeDiv.style.display = "inline-block"; // Display shapes inline
         shapeDiv.style.margin = "5px"; // Add some margin between shapes
 
-        // Create a canvas for each shape
+        // Create a canvas for each triangle
         let shapeCanvas = document.createElement("canvas");
-        shapeCanvas.width = 200; // Set width for the shape canvas
-        shapeCanvas.height = 200; // Set height for the shape canvas
+        shapeCanvas.width = 100; // Set width for the shape canvas
+        shapeCanvas.height = 100; // Set height for the shape canvas
         let ctx = shapeCanvas.getContext("2d");
 
-        // Draw the shape on the canvas
-        let newShape;
-        switch (shape) {
-            case "IsoscelesTriangle":
-                sideA = 30; // Fixed base
-                sideB = 40; // Fixed height
-                newShape = new IsoscelesTriangle(0, 0, sideA, sideB);
-                break;
-            case "EquilateralTriangle":
-                sideA = 30; // Fixed side length
-                newShape = new EquilateralTriangle(0, 0, sideA);
-                break;
-            case "ScaleneTriangle":
-                sideA = 30; // Fixed side length
-                sideB = 40; // Fixed side length
-                sideC = 50; // Fixed side length
-                newShape = new ScaleneTriangle(0, 0, sideA, sideB, sideC);
-                break;
-            case "RightTriangle":
-                sideA = 30; // Fixed base
-                sideB = 40; // Fixed height
-                newShape = new RightTriangle(0, 0, sideA, sideB);
-                break;
-            case "ObtuseTriangle":
-                sideA = 30; // Fixed side length
-                sideB = 40; // Fixed side length
-                sideC = 50; // Fixed side length
-                newShape = new ObtuseTriangle(0, 0, sideA, sideB, sideC);
-                break;
-            case "AcuteTriangle":
-                sideA = 30; // Fixed side length
-                sideB = 40; // Fixed side length
-                sideC = 50; // Fixed side length
-                newShape = new AcuteTriangle(0, 0, sideA, sideB, sideC);
-                break;
-        }
-        
-        // Center the shape on the canvas
-        ctx.translate(shapeCanvas.width / 2, shapeCanvas.height / 2);
-        newShape.draw(ctx); // Draw the shape on the canvas
+        // TODO Center the triangle on the canvas
+        ctx.translate( (shapeCanvas.width / 2) - triangle.getPerimeter() , (shapeCanvas.height / 2) + triangle.getPerimeter());
+        console.log((triangle.getPerimeter() / 2));
+        triangle.draw(ctx,0,0,10); // Draw the triangle on the canvas
 
-        // Add click event to the canvas to buy the shape
+        // Add click event to the canvas to buy the triangle
         shapeCanvas.addEventListener("click", (event) => {
-            buyShape(shape); // Call buyShape with the shape identifier
+            buyShape(triangle); // Pass the triangle object directly
         });
 
         // Append the canvas to the shape div
@@ -75,56 +45,23 @@ function loadShop() {
     });
 }
 
-// ... existing code ...
-
-
-
-function buyShape(shape) {
+function buyShape(triangle) {
     coins = document.getElementById("coins").textContent;
     if (coins >= 3) {
         coins -= 3;
-        document.getElementById("coins").textContent = coins;
-        console.log(`Bought ${shape}!`);
-        // Create shape instances based on the selected shape
-        let newShape;
-        switch (shape) {
-            case "EquilateralTriangle":
-                newShape = new EquilateralTriangle(0, 0, Math.random() * Math.PI); // Random angle
-                break;
-            case "IsoscelesTriangle":
-                newShape = new IsoscelesTriangle(0, 0, Math.random() * Math.PI); // Random angle
-                break;
-            case "ScaleneTriangle":
-                newShape = new ScaleneTriangle(0, 0, Math.random() * Math.PI); // Random angle
-                break;
-            case "RightTriangle":
-                newShape = new RightTriangle(0, 0, Math.random() * Math.PI); // Random angle
-                break;
-            case "ObtuseTriangle":
-                newShape = new ObtuseTriangle(0, 0, Math.random() * Math.PI); // Random angle
-                break;
-            case "AcuteTriangle":
-                newShape = new AcuteTriangle(0, 0, Math.random() * Math.PI); // Random angle
-                break;
-            case "Circle":
-                newShape = new Circle(0, 0, 20); // Fixed radius
-                break;
-            case "Square":
-                newShape = new Square(0, 0, 40); // Fixed size
-                break;
-            default:
-                console.log("Unknown shape!");
-                return;
-        }
-        updateTeamList(shape, newShape); // Pass the newShape to the update function
+        console.log(`Bought Triangle!`);
+
+        // Copy the triangle object to the team
+        teamShapes.push(triangle); // Add the triangle to the teamShapes array
+        updateTeamList(triangle); // Update the team list with the triangle
         drawShapesToTeam(); // Call the function to draw all shapes
     } else {
         console.log("Not enough coins!");
     }
 }
 
-// Update the function to accept the newShape parameter
-function updateTeamList(shape, newShape) {
+function updateTeamList(shape) {
+
     const teamList = document.getElementById("teamList");
     const shapeItem = document.createElement("div");
     shapeItem.textContent = shape; // Display the shape name
@@ -134,26 +71,21 @@ function updateTeamList(shape, newShape) {
     const canvas = document.getElementById("teamCanvas");
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous drawings
-    newShape.x = teamList.children.length * 150; // Set x position based on the number of shapes
-    newShape.y = 75; // Fixed y position for all shapes
-    newShape.draw(ctx); // Draw the shape on the canvas
+    shape.x = 500; // Set x position based on the number of shapes
+    shape.y = 300; // Fixed y position for all shapes
+    shape.draw(ctx); // Draw the shape on the canvas
 }
 
 // New function to draw all shapes on the user's team
 function drawShapesToTeam() {
+    console.log("drawShapesToTeam")
+    console.log( teamList.children.length )
     const canvas = document.getElementById("teamCanvas");
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous drawings
-
-    // Draw each shape next to each other
-    const shapeWidth = 150; // Increased width for each shape
-    const shapeHeight = 150; // Increased height for each shape
-    
-    teamShapes.forEach((shape, index) => {
-        const x = index * (shapeWidth + 20) + shapeWidth / 2; // Adjusted x position
-        const y = 75; // Fixed y position for all shapes
-        shape.x = x; // Set the x position for the shape
-        shape.y = y; // Set the y position for the shape
-        shape.draw(ctx); // Draw the shape on the canvas
+    let counter = 0
+    teamShapes.forEach((shape, index) => {       
+        counter += 100
+        shape.draw(ctx,counter,150,10); 
     });
 }

@@ -16,7 +16,8 @@ document.getElementById("nextButton").addEventListener("click", () => {
     document.getElementById("gameContainer").style.display = "block";
     
     // Create opposing team and start the battle
-    const opposingTeam = createOpposingTeam(3); // Create opposing team with 3 random shapes
-    displayTeams(userTeam, opposingTeam); // Display teams
+    const opposingTeam = createOpposingTeam(3); // Create opposing team with 3 random triangles
+
+    displayTeams(opposingTeam); // Display teams
     startBattle(); // Start the battle
 });

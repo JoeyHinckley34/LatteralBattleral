@@ -7,11 +7,16 @@ let coins = 10;
 document.getElementById("startGameButton").addEventListener("click", () => {
     document.getElementById("landingPage").style.display = "none";
     document.getElementById("shopPage").style.display = "block";
+    document.getElementById("teamContainer").style.display = "block";
     loadShop();
 });
 
 document.getElementById("nextButton").addEventListener("click", () => {
     document.getElementById("shopPage").style.display = "none";
     document.getElementById("gameContainer").style.display = "block";
-    startBattle();
+    
+    // Create opposing team and start the battle
+    const opposingTeam = createOpposingTeam(3); // Create opposing team with 3 random shapes
+    displayTeams(userTeam, opposingTeam); // Display teams
+    startBattle(); // Start the battle
 });

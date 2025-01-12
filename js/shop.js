@@ -1,10 +1,9 @@
 let teamShapes = []; // Array to hold the shapes drawn to the team
 
-
 function loadShop() {
-    document.getElementById("turnNumber").textContent = turn;
-    document.getElementById("lives").textContent = lives;
-    document.getElementById("coins").textContent = coins;
+    turn = document.getElementById("turnNumber").textContent;
+    lives = document.getElementById("lives").textContent;
+    coins = document.getElementById("coins").textContent;
     let shopItemsContainer = document.getElementById("shopItems");
     shopItemsContainer.innerHTML = "";
 
@@ -27,36 +26,36 @@ function loadShop() {
         // Draw the shape on the canvas
         let newShape;
         switch (shape) {
-            case "EquilateralTriangle":
-                sideA = Math.random() * 50 + 10; // Random side length between 10 and 60
-                newShape = new EquilateralTriangle(0, 0, sideA);
-                break;
             case "IsoscelesTriangle":
-                sideA = Math.random() * 50 + 10; // Base
-                sideB = Math.random() * 50 + 10; // Height
+                sideA = 30; // Fixed base
+                sideB = 40; // Fixed height
                 newShape = new IsoscelesTriangle(0, 0, sideA, sideB);
                 break;
+            case "EquilateralTriangle":
+                sideA = 30; // Fixed side length
+                newShape = new EquilateralTriangle(0, 0, sideA);
+                break;
             case "ScaleneTriangle":
-                sideA = Math.random() * 50 + 10; // Random side length
-                sideB = Math.random() * 50 + 10; // Random side length
-                sideC = Math.random() * 50 + 10; // Random side length
+                sideA = 30; // Fixed side length
+                sideB = 40; // Fixed side length
+                sideC = 50; // Fixed side length
                 newShape = new ScaleneTriangle(0, 0, sideA, sideB, sideC);
                 break;
             case "RightTriangle":
-                sideA = Math.random() * 50 + 10; // Base
-                sideB = Math.random() * 50 + 10; // Height
+                sideA = 30; // Fixed base
+                sideB = 40; // Fixed height
                 newShape = new RightTriangle(0, 0, sideA, sideB);
                 break;
             case "ObtuseTriangle":
-                sideA = Math.random() * 50 + 10; // Random side length
-                sideB = Math.random() * 50 + 10; // Random side length
-                sideC = Math.random() * 50 + 10; // Random side length
+                sideA = 30; // Fixed side length
+                sideB = 40; // Fixed side length
+                sideC = 50; // Fixed side length
                 newShape = new ObtuseTriangle(0, 0, sideA, sideB, sideC);
                 break;
             case "AcuteTriangle":
-                sideA = Math.random() * 50 + 10; // Random side length
-                sideB = Math.random() * 50 + 10; // Random side length
-                sideC = Math.random() * 50 + 10; // Random side length
+                sideA = 30; // Fixed side length
+                sideB = 40; // Fixed side length
+                sideC = 50; // Fixed side length
                 newShape = new AcuteTriangle(0, 0, sideA, sideB, sideC);
                 break;
         }
@@ -66,7 +65,7 @@ function loadShop() {
         newShape.draw(ctx); // Draw the shape on the canvas
 
         // Add click event to the canvas to buy the shape
-        shapeCanvas.addEventListener("click", () => {
+        shapeCanvas.addEventListener("click", (event) => {
             buyShape(shape); // Call buyShape with the shape identifier
         });
 
@@ -76,51 +75,68 @@ function loadShop() {
     });
 }
 
+// ... existing code ...
+
+
+
 function buyShape(shape) {
+    coins = document.getElementById("coins").textContent;
     if (coins >= 3) {
-        if (teamShapes.length < 5) { // Check if the team has less than 5 shapes
-            coins -= 3;
-            document.getElementById("coins").textContent = coins;
-            console.log(`Bought ${shape}!`);
-            // Create shape instances based on the selected shape
-            let newShape;
-            switch (shape) {
-                case "EquilateralTriangle":
-                    newShape = new EquilateralTriangle(0, 0, Math.random() * Math.PI); // Random angle
-                    break;
-                case "IsoscelesTriangle":
-                    newShape = new IsoscelesTriangle(0, 0, Math.random() * Math.PI); // Random angle
-                    break;
-                case "ScaleneTriangle":
-                    newShape = new ScaleneTriangle(0, 0, Math.random() * Math.PI); // Random angle
-                    break;
-                case "RightTriangle":
-                    newShape = new RightTriangle(0, 0, Math.random() * Math.PI); // Random angle
-                    break;
-                case "ObtuseTriangle":
-                    newShape = new ObtuseTriangle(0, 0, Math.random() * Math.PI); // Random angle
-                    break;
-                case "AcuteTriangle":
-                    newShape = new AcuteTriangle(0, 0, Math.random() * Math.PI); // Random angle
-                    break;
-                case "Circle":
-                    newShape = new Circle(0, 0, 20); // Fixed radius
-                    break;
-                case "Square":
-                    newShape = new Square(0, 0, 40); // Fixed size
-                    break;
-                default:
-                    console.log("Unknown shape!");
-                    return;
-            }
-            teamShapes.push(newShape); // Add the shape instance to the teamShapes array
-            drawShapesToTeam(); // Call the function to draw all shapes
-        } else {
-            console.log("You can only have 5 shapes at a time!");
+        coins -= 3;
+        document.getElementById("coins").textContent = coins;
+        console.log(`Bought ${shape}!`);
+        // Create shape instances based on the selected shape
+        let newShape;
+        switch (shape) {
+            case "EquilateralTriangle":
+                newShape = new EquilateralTriangle(0, 0, Math.random() * Math.PI); // Random angle
+                break;
+            case "IsoscelesTriangle":
+                newShape = new IsoscelesTriangle(0, 0, Math.random() * Math.PI); // Random angle
+                break;
+            case "ScaleneTriangle":
+                newShape = new ScaleneTriangle(0, 0, Math.random() * Math.PI); // Random angle
+                break;
+            case "RightTriangle":
+                newShape = new RightTriangle(0, 0, Math.random() * Math.PI); // Random angle
+                break;
+            case "ObtuseTriangle":
+                newShape = new ObtuseTriangle(0, 0, Math.random() * Math.PI); // Random angle
+                break;
+            case "AcuteTriangle":
+                newShape = new AcuteTriangle(0, 0, Math.random() * Math.PI); // Random angle
+                break;
+            case "Circle":
+                newShape = new Circle(0, 0, 20); // Fixed radius
+                break;
+            case "Square":
+                newShape = new Square(0, 0, 40); // Fixed size
+                break;
+            default:
+                console.log("Unknown shape!");
+                return;
         }
+        updateTeamList(shape, newShape); // Pass the newShape to the update function
+        drawShapesToTeam(); // Call the function to draw all shapes
     } else {
         console.log("Not enough coins!");
     }
+}
+
+// Update the function to accept the newShape parameter
+function updateTeamList(shape, newShape) {
+    const teamList = document.getElementById("teamList");
+    const shapeItem = document.createElement("div");
+    shapeItem.textContent = shape; // Display the shape name
+    teamList.appendChild(shapeItem); // Add the new shape to the team list
+
+    // Draw the new shape directly in the team container
+    const canvas = document.getElementById("teamCanvas");
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous drawings
+    newShape.x = teamList.children.length * 150; // Set x position based on the number of shapes
+    newShape.y = 75; // Fixed y position for all shapes
+    newShape.draw(ctx); // Draw the shape on the canvas
 }
 
 // New function to draw all shapes on the user's team

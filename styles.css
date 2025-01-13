@@ -18,3 +18,9 @@ canvas {
 startGameButton {
     padding: 20px
 }
+
+#userCanvas,
+#opposingCanvas {
+    display: none; /* Hide canvases initially */
+}
+

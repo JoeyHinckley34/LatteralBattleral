@@ -11,27 +11,27 @@
         <div id="landingPage">
             <h1>Welcome to Lateral Battleral</h1>
             <button id="startGameButton">Start Game</button>
-            <!-- <img id="teamImage" src="2D-Geometric-Shapes.jpg" alt="Description of image" style="display: block; width: 300px; height: auto; margin: auto;"> -->
         </div>
         <div id="shopPage" style="display: none;">
-            <h2>Turn <span id="turnNumber">1</span></h2>
-            <p>Lives: <span id="lives">5</span></p>
-            <p>Coins: <span id="coins">100</span></p>
-            <h3>Shop</h3>
+            <h2>Shop</h2>
+        
             <div id="shopItems"></div>
             <button id="nextButton">Next</button>
         </div>
-
-        <div id="teamContainer" style="display: none;"">
-            <h3>Team Container</h3>
-            <canvas id="teamCanvas" width="800" height="200"></canvas> 
-            <div id="teamList"></div>
+        <div id="battleContainer" style="display: none;">
+            <h2>Battle Arena</h2>
+            <div id="user-team"></div>
+            <div id="opposing-team"></div>
+            <div id="battleLog"></div>
+            <div id="user-buttons"></div>
+            <div id="opposing-buttons"></div>
         </div>
     </div>
+    <canvas id="opposingCanvas" width="500" height="200"></canvas>
+    <canvas id="userCanvas" width="500" height="200"></canvas>
     <script src="js/main.js"></script>
     <script src="js/shop.js"></script>
     <script src="js/battle.js"></script>
     <script src="js/shapes.js"></script>
-
 </body>
 </html>

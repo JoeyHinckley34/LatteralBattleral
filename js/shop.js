@@ -10,7 +10,7 @@ function loadShop() {
     // Hard-coded triangles for the shop
     const triangles = [
         new Triangle(3, 4, 5),
-        new Triangle(4, 5, 6), 
+        new Triangle(4, 3, 5), 
         new Triangle(3, 2, 2), 
         new Triangle(3, 4, 6), 
         new Triangle(5, 5, 3), 
@@ -30,8 +30,8 @@ function loadShop() {
         let ctx = shapeCanvas.getContext("2d");
 
         // TODO Center the triangle on the canvas
-        ctx.translate( (shapeCanvas.width / 2) - triangle.getPerimeter() , (shapeCanvas.height / 2) + triangle.getPerimeter());
-        console.log((triangle.getPerimeter() / 2));
+        ctx.translate( (shapeCanvas.width / 2) - triangle.getWidth()*5, (shapeCanvas.height / 2) + triangle.getHeight()*5 );
+        console.log((triangle.getHeight()));
         triangle.draw(ctx,0,0,10); // Draw the triangle on the canvas
 
         // Add click event to the canvas to buy the triangle
@@ -61,12 +61,6 @@ function buyShape(triangle) {
 }
 
 function updateTeamList(shape) {
-
-    const teamList = document.getElementById("teamList");
-    const shapeItem = document.createElement("div");
-    shapeItem.textContent = shape; // Display the shape name
-    teamList.appendChild(shapeItem); // Add the new shape to the team list
-
     // Draw the new shape directly in the team container
     const canvas = document.getElementById("teamCanvas");
     const ctx = canvas.getContext("2d");

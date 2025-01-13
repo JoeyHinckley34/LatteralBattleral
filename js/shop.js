@@ -9,12 +9,14 @@ function loadShop() {
 
     // Hard-coded triangles for the shop
     const triangles = [
-        new Triangle(3, 4, 5),
-        new Triangle(4, 3, 5), 
-        new Triangle(3, 2, 2), 
-        new Triangle(3, 4, 6), 
-        new Triangle(5, 5, 3), 
-        new Triangle(6, 6, 6)  
+        new Triangle(5, 5, 5),
+        new Triangle(3, 4, 4), 
+        new Triangle(Math.sqrt(32),4, 4), 
+        new Triangle(7, 4, 4), 
+        new Triangle(2, 4, 3), 
+        new Triangle(5, 4, 3),
+        new Triangle(6, 4, 3),
+          
     ];
 
     triangles.forEach((triangle, index) => {

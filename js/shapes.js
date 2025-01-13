@@ -1,6 +1,7 @@
 class Triangle {
     constructor(a, b, c) {
-        this.sides = [a, b, c].sort((x, y) => x - y); // Ensure sides are ordered
+        this.sidesSorted = [a, b, c].sort((x, y) => x - y); // Ensure sides are ordered
+        this.sides = [a, b, c]
         if (!this.isValidTriangle()) {
             throw new Error("Invalid triangle: Side lengths do not satisfy triangle inequality.");
         }
@@ -10,19 +11,19 @@ class Triangle {
     }
 
     isValidTriangle() {
-        const [x, y, z] = this.sides;
+        const [x, y, z] = this.sidesSorted;
         return x + y > z;
     }
 
     getTriangleType() {
-        const [a, b, c] = this.sides;
+        const [a, b, c] = this.sidesSorted;
         if (a === b && b === c) return "Equilateral";
         if (a === b || b === c || a === c) return "Isosceles";
         return "Scalene";
     }
 
     calculateAngles() {
-        const [a, b, c] = this.sides;
+        const [a, b, c] = this.sidesSorted;
         const radToDeg = (rad) => (rad * 180) / Math.PI;
 
         const angleA = radToDeg(Math.acos((b ** 2 + c ** 2 - a ** 2) / (2 * b * c)));

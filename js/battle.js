@@ -43,13 +43,4 @@ function createOpposingTeam(size) {
     return opposingTeam;
 }
 
-// Display teams
-function displayTeams(userTeam, opposingTeam) {
-    // Display user team at the bottom
-    console.log("User Team: ", userTeam);
-    // Display opposing team at the top
-    opposingTeam.forEach(triangle => {
-        console.log("Opposing Team Triangle: ", triangle);
-    });
-}
 

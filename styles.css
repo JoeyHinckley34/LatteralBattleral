@@ -24,3 +24,20 @@ startGameButton {
     display: none; /* Hide canvases initially */
 }
 
+#battleContainer {
+    position: relative; /* Ensure positioning context */
+}
+
+#userCanvas {
+    position: absolute; /* Position it absolutely within the battle container */
+    top: 0; /* Adjust as needed */
+    left: 0; /* Adjust as needed */
+    z-index: 10; /* Ensure it's on top */
+    background-color: rgba(255, 0, 0, 0.5); /* Semi-transparent red for visibility */
+}
+
+#user-team {
+    position: relative; /* Ensure it doesn't overlap the canvas */
+    z-index: 1; /* Lower z-index than the canvas */
+}
+

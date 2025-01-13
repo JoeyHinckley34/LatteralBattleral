@@ -1,190 +1,275 @@
-/* js/battle.js */
-function startBattle() {
-    currentState = GAME_STATE.BATTLE;
-    console.log("Battle started!");
-    battleLoop();
-}
-
-let currentTurn = 'user'; // Track whose turn it is
-
-function useShapeAbility(userTeam, opposingTeam) {
-    if (currentTurn === 'user') {
-        // Example ability: remove a shape from the opposing team
-        if (opposingTeam.length > 0) {
-            const removedShape = opposingTeam.pop(); // Remove the last shape from the opposing team
-            console.log("User used ability! Opposing team shape removed: ", removedShape);
-        }
-        currentTurn = 'opposing'; // Switch turn
-    } else {
-        // Opposing team logic can be added here later
-        console.log("It's the opposing team's turn.");
-        currentTurn = 'user'; // Switch turn back
+// File: js/battle.js
+class BattleManager {
+    constructor() {
+        this.userTeam = [];
+        this.opposingTeam = [];
+        this.selectedShape = null;
+        this.selectedAbility = null;
+        this.battleContainer = document.getElementById('battleContainer');
+        this.battleLog = document.getElementById('battleLog');
+        this.initialize();
     }
-}
 
-// Function to display the opposing team on the screen
-function displayOpposingTeam(opposingTeam) {
-    const opposingTeamContainer = document.getElementById('opposing-team'); // Assuming there's a container in your HTML
-    opposingTeamContainer.innerHTML = ''; // Clear previous content
-    const canvas = document.getElementById("opposingCanvas"); // Assuming there's a canvas for the opposing team
-    const ctx = canvas.getContext("2d");
-    opposingTeam.forEach((shape, index) => {
-        shape.draw(ctx, 50 + index * 100,100, 10); // Draw each shape with an offset
-    });
-}
+    initialize() {
+        document.addEventListener('DOMContentLoaded', () => {
+            // Your initialization code here
+            this.userCanvas = document.getElementById('userCanvas');
+            this.userCtx = this.userCanvas.getContext('2d');
 
-// Function to display the user's team on the screen
-function displayTeams(userTeam) {
-    const userTeamContainer = document.getElementById('user-team'); // Assuming there's a container in your HTML
-    userTeamContainer.innerHTML = ''; // Clear previous content
-    const canvas = document.getElementById("userCanvas"); // Assuming there's a canvas for the user team
-    const ctx = canvas.getContext("2d");
-    userTeam.forEach((shape, index) => {
-        shape.draw(ctx, 50 + index * 100, 100, 10); // Draw each shape with an offset
-    });
-}
+            this.opposingCanvas = document.getElementById('opposingCanvas');
+            this.opposingCtx = this.opposingCanvas.getContext('2d');
 
-// Modify the battle loop to include turn-based actions and display the opposing team
-function battleLoop() {
-    console.log("Battle in progress...");
-    // useShapeAbility(userTeam, opposingTeam); // Call the ability function
-    // displayOpposingTeam(opposingTeam); // Display the opposing team
-    // requestAnimationFrame(battleLoop);
-}
+            // Test drawing
+            this.testCanvas();
+        });
 
-// Create opposing team
-function createOpposingTeam(size) {
-    const opposingTeam = [];
-    for (let i = 0; i < size; i++) {
-        // Assuming the new Triangle class takes three sides as parameters
-        const a = 3; 
-        const b = 4; 
-        const c = 5; 
-        const triangle = new Triangle(a, b, c); // Create a new Triangle instance
-        opposingTeam.push(triangle);
+        // Set up canvas contexts
+        this.userCanvas = document.getElementById("userCanvas");
+        this.opposingCanvas = document.getElementById("opposingCanvas");
+        this.userCtx = this.userCanvas.getContext("2d");
+        this.opposingCtx = this.opposingCanvas.getContext("2d");
+
+        // Setup click handlers
+        this.userCanvas.addEventListener('click', (e) => this.handleUserTeamClick(e));
+        this.opposingCanvas.addEventListener('click', (e) => this.handleOpposingTeamClick(e));
+        
+        // Create ability menu
+        this.abilityMenu = document.createElement('div');
+        this.abilityMenu.id = 'ability-menu';
+        this.battleContainer.appendChild(this.abilityMenu);
+        
+        // Add initial styles
+        this.addStyles();
     }
-    return opposingTeam;
-}
 
-function updateTeamList(shape) {
-    // Draw the new shape directly in the team container
-    const canvas = document.getElementById("teamCanvas");
-    const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous drawings
-    shape.x = 500; // Set x position based on the number of shapes
-    shape.y = 300; // Fixed y position for all shapes
-    shape.draw(ctx); // Draw the shape on the canvas
-}
-
-// Add event listeners for user team and opposing team canvas
-const userCanvas = document.getElementById("userCanvas");
-const opposingCanvas = document.getElementById("opposingCanvas");
-
-userCanvas.addEventListener('click', (event) => {
-    const shape = getShapeAt(event, userTeam);
-    if (shape) {
-        selectUserShape(shape);
-    }
-});
-
-opposingCanvas.addEventListener('click', (event) => {
-    const targetShape = getShapeAt(event, opposingTeam);
-    if (targetShape && selectedUserShape) {
-        attack(selectedUserShape, targetShape);
-    }
-});
-
-// Function to check if a point is inside a triangle
-function isPointInsideTriangle(x, y, triangle, position) {
-    const [a, b, c] = triangle.sides; // Get the sides of the triangle
-    const scale = 1; // Adjust scale if necessary
-
-    // Calculate vertices based on the position and side lengths
-    const x1 = position.x;
-    const y1 = position.y;
-    const x2 = x1 + a * scale; // Vertex B
-    const angleA = Math.acos((b ** 2 + c ** 2 - a ** 2) / (2 * b * c));
-    const x3 = x1 + b * scale * Math.cos(angleA); // Vertex C x-coordinate
-    const y3 = y1 - b * scale * Math.sin(angleA); // Vertex C y-coordinate
-
-    // Barycentric coordinates method to check if point is inside the triangle
-    const area = 0.5 * (-y2 * x1 + x2 * (y1 - y3) + x1 * (y2 - y3));
-    const s = 1 / (2 * area) * (y1 * x2 - x1 * y2 + (y2 - y1) * x);
-    const t = 1 / (2 * area) * (x1 * y3 - y1 * x3 + (x1 - x2) * y);
-
-    return s >= 0 && t >= 0 && (s + t) <= 1;
-}
-
-// Update the getShapeAt function to use the new isPointInsideTriangle function
-function getShapeAt(event, team) {
-    const rect = event.target.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
-    for (const shape of team) {
-        try {
-            const position = { x: shape.position.x, y: shape.position.y }; // Ensure this is defined
-            console.log("Checking shape:", shape, "at position:", position); // Debug log
-            if (isPointInsideTriangle(x, y, shape, position)) {
-                return shape; // Return the shape if the point is inside
+    addStyles() {
+        const styleSheet = document.createElement("style");
+        styleSheet.textContent = `
+            #battleContainer {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+                padding: 20px;
             }
-        } catch (error) {
-            console.error("Error checking shape:", error);
+
+            #ability-menu {
+                position: absolute;
+                background: white;
+                border: 2px solid #333;
+                border-radius: 5px;
+                padding: 10px;
+                display: none;
+                z-index: 1000;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            }
+
+            #ability-menu button {
+                display: block;
+                width: 100%;
+                padding: 8px 15px;
+                margin: 5px 0;
+                border: none;
+                border-radius: 3px;
+                background: #4CAF50;
+                color: white;
+                cursor: pointer;
+                transition: background 0.3s;
+            }
+
+            #ability-menu button:hover {
+                background: #45a049;
+            }
+
+            #battleLog {
+                width: 80%;
+                max-height: 150px;
+                overflow-y: auto;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                margin: 10px 0;
+                font-family: monospace;
+            }
+
+            canvas {
+                border: 2px solid #333;
+                border-radius: 5px;
+                margin: 10px;
+            }
+        `;
+        document.head.appendChild(styleSheet);
+    }
+
+    log(message) {
+        const logEntry = document.createElement('div');
+        logEntry.textContent = `➤ ${message}`;
+        this.battleLog.appendChild(logEntry);
+        this.battleLog.scrollTop = this.battleLog.scrollHeight;
+    }
+
+    handleUserTeamClick(event) {
+        const rect = this.userCanvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        
+        const clickedShape = this.findShapeAtPosition(x, y, this.userTeam);
+        
+        if (clickedShape) {
+            this.selectShape(clickedShape);
+            this.log(`Selected ${clickedShape.type} triangle`);
         }
     }
-    return null; // No shape found
-}
 
-// Function to create buttons for the user's team
-function createUserButtons(userTeam) {
-    const userButtonContainer = document.getElementById('user-buttons');
-    userButtonContainer.innerHTML = ''; // Clear previous buttons
+    handleOpposingTeamClick(event) {
+        if (!this.selectedShape || !this.selectedAbility) {
+            this.log("Select a shape and ability first!");
+            return;
+        }
 
-    userTeam.forEach((shape, index) => {
-        const button = document.createElement('button');
-        button.innerText = `Select Shape ${index + 1}`;
-        button.onclick = () => selectUserShape(shape);
-        userButtonContainer.appendChild(button);
-    });
-}
-
-// Function to create buttons for the opposing team
-function createOpposingButtons(opposingTeam) {
-    const opposingButtonContainer = document.getElementById('opposing-buttons');
-    opposingButtonContainer.innerHTML = ''; // Clear previous buttons
-
-    opposingTeam.forEach((shape, index) => {
-        const button = document.createElement('button');
-        button.innerText = `Attack Shape ${index + 1}`;
-        button.onclick = () => {
-            if (selectedUserShape) {
-                attack(selectedUserShape, shape);
-            } else {
-                console.log("No shape selected for attack.");
-            }
-        };
-        opposingButtonContainer.appendChild(button);
-    });
-}
-
-// Function to handle user shape selection
-let selectedUserShape = null;
-function selectUserShape(shape) {
-    selectedUserShape = shape;
-    console.log("Selected shape for attack: ", shape);
-}
-
-// Function to handle the attack logic
-function attack(userShape, targetShape) {
-    console.log("Attacking with: ", userShape, " on target: ", targetShape);
-    // Implement attack logic here (e.g., remove target shape from opposing team)
-    const index = opposingTeam.indexOf(targetShape);
-    if (index > -1) {
-        opposingTeam.splice(index, 1); // Remove the target shape
-        console.log("Target shape removed: ", targetShape);
+        const rect = this.opposingCanvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        
+        const targetShape = this.findShapeAtPosition(x, y, this.opposingTeam);
+        
+        if (targetShape) {
+            this.executeAbility(this.selectedShape, targetShape, this.selectedAbility);
+        }
     }
-    // Update the display after the attack
-    displayOpposingTeam(opposingTeam);
+
+    findShapeAtPosition(x, y, team) {
+        return team.find(shape => {
+            const dx = x - shape.position.x;
+            const dy = y - shape.position.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            return distance < 30;
+        });
+    }
+
+    selectShape(shape) {
+        if (this.selectedShape) {
+            this.selectedShape.isSelected = false;
+        }
+
+        this.selectedShape = shape;
+        shape.isSelected = true;
+        this.showAbilityMenu(shape);
+        this.redrawTeams();
+    }
+
+    showAbilityMenu(shape) {
+        this.abilityMenu.innerHTML = '';
+        this.selectedAbility = null;
+
+        const abilities = this.getShapeAbilities(shape);
+        abilities.forEach(ability => {
+            const button = document.createElement('button');
+            button.textContent = ability.name;
+            button.onclick = () => {
+                this.selectAbility(ability);
+                this.log(`Selected ability: ${ability.name}`);
+            };
+            this.abilityMenu.appendChild(button);
+        });
+
+        const rect = this.userCanvas.getBoundingClientRect();
+        this.abilityMenu.style.position = 'absolute';
+        this.abilityMenu.style.left = `${shape.position.x + rect.left}px`;
+        this.abilityMenu.style.top = `${shape.position.y + rect.top + 50}px`;
+        this.abilityMenu.style.display = 'block';
+    }
+
+    getShapeAbilities(shape) {
+        return [
+            {
+                name: 'Basic Attack',
+                execute: (attacker, target) => {
+                    const damage = 1; // Remove one tick mark
+                    this.applyDamage(target, damage);
+                }
+            }
+        ];
+    }
+
+    selectAbility(ability) {
+        this.selectedAbility = ability;
+    }
+
+    executeAbility(attacker, target, ability) {
+        if (!ability) return;
+        
+        ability.execute(attacker, target);
+        this.checkForDefeatedShapes();
+        this.redrawTeams();
+        
+        this.selectedShape.isSelected = false;
+        this.selectedShape = null;
+        this.selectedAbility = null;
+        this.abilityMenu.style.display = 'none';
+    }
+
+    applyDamage(shape, damage) {
+        const currentPerimeter = shape.getPerimeter();
+        // Reduce one of the sides by the damage amount
+        shape.sides[0] = Math.max(1, shape.sides[0] - damage);
+        const newPerimeter = shape.getPerimeter();
+        this.log(`${shape.type} triangle took damage! Perimeter: ${currentPerimeter} → ${newPerimeter}`);
+    }
+
+    checkForDefeatedShapes() {
+        this.userTeam = this.userTeam.filter(shape => shape.getPerimeter() > 3);
+        this.opposingTeam = this.opposingTeam.filter(shape => shape.getPerimeter() > 3);
+        
+        if (this.userTeam.length === 0) {
+            this.log("Game Over - Opposing Team Wins!");
+        } else if (this.opposingTeam.length === 0) {
+            this.log("Victory - User Team Wins!");
+        }
+    }
+
+    redrawTeams() {
+        this.userCtx.clearRect(0, 0, this.userCanvas.width, this.userCanvas.height);
+        this.opposingCtx.clearRect(0, 0, this.opposingCanvas.width, this.opposingCanvas.height);
+
+        // Test drawing a rectangle to check if the canvas is working
+        this.userCtx.fillStyle = 'red';
+        this.userCtx.fillRect(10, 10, 50, 50); // Draw a red square
+        this.opposingCtx.fillStyle = 'blue';
+        this.opposingCtx.fillRect(10, 10, 50, 50); // Draw a blue square
+
+        this.userTeam.forEach((shape, index) => {
+            const x = 50 + index * 100;
+            const y = 100;
+            shape.position = { x, y };
+            console.log(`Drawing user shape: ${shape.type} at (${x}, ${y})`);
+            shape.draw(this.userCtx, x, y);
+        });
+
+        this.opposingTeam.forEach((shape, index) => {
+            const x = 50 + index * 100;
+            const y = 100;
+            shape.position = { x, y };
+            console.log(`Drawing opposing shape: ${shape.type} at (${x}, ${y})`);
+            shape.draw(this.opposingCtx, x, y);
+        });
+    }
+
+    addToUserTeam(shape) {
+        this.userTeam.push(shape);
+        console.log(this.userTeam.length)
+        this.redrawTeams();
+    }
+
+    addToOpposingTeam(shape) {
+        this.opposingTeam.push(shape);
+        this.redrawTeams();
+    }
+
+    testCanvas() {
+        this.userCtx.fillStyle = 'red';
+        this.userCtx.fillRect(10, 10, 50, 50); // Draw a red square
+        this.opposingCtx.fillStyle = 'blue';
+        this.opposingCtx.fillRect(10, 10, 50, 50); // Draw a blue square
+    }
 }
-
-

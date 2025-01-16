@@ -21,6 +21,9 @@ class ShopManager {
         document.getElementById('nextButton').addEventListener('click', () => {
             this.shopContainer.style.display = 'none';
             document.getElementById('battleContainer').style.display = 'block';
+            
+            this.battleManager.generateNewOpposingTeam();
+            document.getElementById('opposingCanvas').style.display = 'block';
             this.battleManager.redrawTeams();
         });
 

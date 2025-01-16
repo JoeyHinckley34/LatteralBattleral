@@ -232,32 +232,25 @@ class BattleManager {
         this.userCtx.clearRect(0, 0, this.userCanvas.width, this.userCanvas.height);
         this.opposingCtx.clearRect(0, 0, this.opposingCanvas.width, this.opposingCanvas.height);
 
-        // Test drawing a rectangle to check if the canvas is working
-        this.userCtx.fillStyle = 'red';
-        this.userCtx.fillRect(10, 10, 50, 50); // Draw a red square
-        this.opposingCtx.fillStyle = 'blue';
-        this.opposingCtx.fillRect(10, 10, 50, 50); // Draw a blue square
-
         this.userTeam.forEach((shape, index) => {
             const x = 50 + index * 100;
-            const y = 100;
+            const y = 150;
             shape.position = { x, y };
-            console.log(`Drawing user shape: ${shape.type} at (${x}, ${y})`);
-            shape.draw(this.userCtx, x, y);
+            shape.draw(this.userCtx, x, y); // Ensure this method is implemented correctly
         });
 
+       
         this.opposingTeam.forEach((shape, index) => {
             const x = 50 + index * 100;
             const y = 100;
             shape.position = { x, y };
-            console.log(`Drawing opposing shape: ${shape.type} at (${x}, ${y})`);
-            shape.draw(this.opposingCtx, x, y);
+
+            shape.draw(this.opposingCtx, x, y); // Ensure this method is implemented correctly
         });
     }
 
     addToUserTeam(shape) {
         this.userTeam.push(shape);
-        console.log(this.userTeam.length)
         this.redrawTeams();
     }
 
@@ -271,5 +264,24 @@ class BattleManager {
         this.userCtx.fillRect(10, 10, 50, 50); // Draw a red square
         this.opposingCtx.fillStyle = 'blue';
         this.opposingCtx.fillRect(10, 10, 50, 50); // Draw a blue square
+    }
+
+    generateNewOpposingTeam() {
+        this.opposingTeam = []; // Clear the existing team
+        const shapes = [
+            { sides: [5, 5, 5], type: 'Equilateral' },
+            { sides: [3, 4, 5], type: 'Right' },
+            { sides: [4, 4, 4], type: 'Equilateral' },
+            { sides: [6, 6, 4], type: 'Isosceles' },
+            { sides: [7, 5, 4], type: 'Scalene' }
+        ];
+
+        // Randomly select shapes to add to the opposing team
+        for (let i = 0; i < 3; i++) { // Example: Add 3 shapes
+            const shapeData = shapes[Math.floor(Math.random() * shapes.length)];
+            const newShape = new Triangle(...shapeData.sides);
+            newShape.type = shapeData.type; // Set the type
+            this.addToOpposingTeam(newShape);
+        }
     }
 }

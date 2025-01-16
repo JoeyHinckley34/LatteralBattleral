@@ -125,7 +125,7 @@ class Triangle {
     }
 
     // Enhanced draw method with battle features
-    draw(ctx, x = 50, y = 200, scale = 30) {
+    draw(ctx, x = 50, y = 200, scale = 10) {
         this.position = { x, y }; // Store position for battle mechanics
 
         // Draw selection indicator if selected

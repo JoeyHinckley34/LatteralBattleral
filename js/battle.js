@@ -7,6 +7,8 @@ class BattleManager {
         this.selectedAbility = null;
         this.battleContainer = document.getElementById('battleContainer');
         this.battleLog = document.getElementById('battleLog');
+        this.currentTurn = 'user';
+        this.abilityMenu = document.getElementById('ability-menu');
         this.initialize();
     }
 
@@ -32,73 +34,6 @@ class BattleManager {
         // Setup click handlers
         this.userCanvas.addEventListener('click', (e) => this.handleUserTeamClick(e));
         this.opposingCanvas.addEventListener('click', (e) => this.handleOpposingTeamClick(e));
-        
-        // Create ability menu
-        this.abilityMenu = document.createElement('div');
-        this.abilityMenu.id = 'ability-menu';
-        this.battleContainer.appendChild(this.abilityMenu);
-        
-        // Add initial styles
-        this.addStyles();
-    }
-
-    addStyles() {
-        const styleSheet = document.createElement("style");
-        styleSheet.textContent = `
-            #battleContainer {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 20px;
-                padding: 20px;
-            }
-
-            #ability-menu {
-                position: absolute;
-                background: white;
-                border: 2px solid #333;
-                border-radius: 5px;
-                padding: 10px;
-                display: none;
-                z-index: 1000;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            }
-
-            #ability-menu button {
-                display: block;
-                width: 100%;
-                padding: 8px 15px;
-                margin: 5px 0;
-                border: none;
-                border-radius: 3px;
-                background: #4CAF50;
-                color: white;
-                cursor: pointer;
-                transition: background 0.3s;
-            }
-
-            #ability-menu button:hover {
-                background: #45a049;
-            }
-
-            #battleLog {
-                width: 80%;
-                max-height: 150px;
-                overflow-y: auto;
-                padding: 10px;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                margin: 10px 0;
-                font-family: monospace;
-            }
-
-            canvas {
-                border: 2px solid #333;
-                border-radius: 5px;
-                margin: 10px;
-            }
-        `;
-        document.head.appendChild(styleSheet);
     }
 
     log(message) {
@@ -122,6 +57,11 @@ class BattleManager {
     }
 
     handleOpposingTeamClick(event) {
+        if (this.currentTurn !== 'user') {
+            this.log("Wait for your turn!");
+            return;
+        }
+
         if (!this.selectedShape || !this.selectedAbility) {
             this.log("Select a shape and ability first!");
             return;
@@ -174,9 +114,9 @@ class BattleManager {
         });
 
         const rect = this.userCanvas.getBoundingClientRect();
-        this.abilityMenu.style.position = 'absolute';
-        this.abilityMenu.style.left = `${shape.position.x + rect.left}px`;
-        this.abilityMenu.style.top = `${shape.position.y + rect.top + 50}px`;
+        this.abilityMenu.style.position = 'relative';
+        // this.abilityMenu.style.left = `${shape.position.x + rect.left}px`;
+        // this.abilityMenu.style.top = `${shape.position.y + rect.top - 50}px`;
         this.abilityMenu.style.display = 'block';
     }
 
@@ -185,8 +125,10 @@ class BattleManager {
             {
                 name: 'Basic Attack',
                 execute: (attacker, target) => {
-                    const damage = 1; // Remove one tick mark
+                    const damage = 20;
                     this.applyDamage(target, damage);
+                    // Store the new sides after damage
+                    target.sides = [...target.sides]; // Create new array to ensure update
                 }
             }
         ];
@@ -207,14 +149,39 @@ class BattleManager {
         this.selectedShape = null;
         this.selectedAbility = null;
         this.abilityMenu.style.display = 'none';
+
+        if (this.currentTurn === 'user') {
+            this.currentTurn = 'opponent';
+            setTimeout(() => this.executeOpponentTurn(), 1000);
+        }
+    }
+
+    executeOpponentTurn() {
+        if (this.opposingTeam.length === 0 || this.userTeam.length === 0) {
+            return;
+        }
+
+        const attacker = this.opposingTeam[Math.floor(Math.random() * this.opposingTeam.length)];
+        const target = this.userTeam[Math.floor(Math.random() * this.userTeam.length)];
+        
+        const ability = this.getShapeAbilities(attacker)[0];
+
+        this.log(`Opponent's ${attacker.type} triangle attacks ${target.type} triangle!`);
+        
+        ability.execute(attacker, target);
+        this.checkForDefeatedShapes();
+        this.redrawTeams();
+
+        this.currentTurn = 'user';
+        this.log("Your turn!");
     }
 
     applyDamage(shape, damage) {
-        const currentPerimeter = shape.getPerimeter();
-        // Reduce one of the sides by the damage amount
-        shape.sides[0] = Math.max(1, shape.sides[0] - damage);
-        const newPerimeter = shape.getPerimeter();
-        this.log(`${shape.type} triangle took damage! Perimeter: ${currentPerimeter} → ${newPerimeter}`);
+        // Instead of modifying sides, we set a damaged state
+        shape.isDamaged = true; // New property to track damage state
+        
+        shape.takeDamage(damage); // Use the attack function from shape.js
+        this.log(`${shape.type} triangle took damage!`);
     }
 
     checkForDefeatedShapes() {
@@ -236,16 +203,18 @@ class BattleManager {
             const x = 50 + index * 100;
             const y = 150;
             shape.position = { x, y };
-            shape.draw(this.userCtx, x, y); // Ensure this method is implemented correctly
+            shape.draw(this.userCtx, x, y); // Pass the damage state to the draw method
         });
 
-       
+        // Set fill style for opposing shapes
+        this.opposingCtx.fillStyle = 'red'; // Change color to red
+
         this.opposingTeam.forEach((shape, index) => {
             const x = 50 + index * 100;
             const y = 100;
             shape.position = { x, y };
 
-            shape.draw(this.opposingCtx, x, y); // Ensure this method is implemented correctly
+            shape.draw(this.opposingCtx, x, y); // Pass the damage state to the draw method
         });
     }
 
@@ -259,12 +228,6 @@ class BattleManager {
         this.redrawTeams();
     }
 
-    testCanvas() {
-        this.userCtx.fillStyle = 'red';
-        this.userCtx.fillRect(10, 10, 50, 50); // Draw a red square
-        this.opposingCtx.fillStyle = 'blue';
-        this.opposingCtx.fillRect(10, 10, 50, 50); // Draw a blue square
-    }
 
     generateNewOpposingTeam() {
         this.opposingTeam = []; // Clear the existing team

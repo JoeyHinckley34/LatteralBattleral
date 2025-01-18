@@ -7,23 +7,24 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="gameContainer">
-        <div id="landingPage">
-            <h1>Welcome to Lateral Battleral</h1>
-            <button id="startGameButton">Start Game</button>
-        </div>
-        <div id="shopPage" style="display: none;">
-            <h2>Shop</h2>
-            <div id="shopItems"></div>
-            <button id="nextButton">Next</button>
-        </div>
-     
-        <div id="battleContainer" style="display: none;">
-            <div id="battleLog"></div>
-        </div>
+   
+    <!-- <div id="gameContainer"> -->
+    <div id="landingPage">
+        <h1>Welcome to Lateral Battleral</h1>
+        <button id="startGameButton">Start Game</button>
     </div>
+    <div id="shopPage" style="display: none;">
+        <h2>Shop</h2>
+        <div id="shopItems"></div>
+        <button id="nextButton">Next</button>
+    </div>
+
     <canvas id="opposingCanvas" width="500" height="200"></canvas>
     <canvas id="userCanvas" width="500" height="200"></canvas>
+    <div id="battleContainer" style="display: none;">
+        <div id="battleLog"></div>
+        <div id="ability-menu"></div>
+    </div>
     <script src="js/main.js"></script>
     <script src="js/shop.js"></script>
     <script src="js/battle.js"></script>

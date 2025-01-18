@@ -9,16 +9,27 @@ class Triangle {
 
         this.type = this.getTriangleType();
         this.angles = this.calculateAngles();
+        this.angleType = this.getAngleType();
+        this.sideType = this.getTriangleType();
 
         // Battle properties
-        this.health = 100;
-        this.maxHealth = 100;
+        this.attack = 1
+        this.health = this.getHealth();
+        this.maxHealth = this.getMaxHealth();
         this.position = { x: 0, y: 0 };
-        this.battleStats = this.calculateBattleStats();
+        // this.battleStats = this.calculateBattleStats();
         this.isSelected = false;
     }
 
-    // Existing geometric methods
+    getHealth() {
+        //To do: if taken damage then subtract
+        return this.sides[0] + this.sides[1] + this.sides[2];
+    }
+
+    getMaxHealth() {
+        return this.sides[0] + this.sides[1] + this.sides[2];
+    }
+
     isValidTriangle() {
         const [x, y, z] = this.sidesSorted;
         return x + y > z;
@@ -26,9 +37,11 @@ class Triangle {
 
     getTriangleType() {
         const [a, b, c] = this.sidesSorted;
+
+        // Classify based on sides
         if (a === b && b === c) return "Equilateral";
         if (a === b || b === c || a === c) return "Isosceles";
-        return "Scalene";
+        return "Scalene"; // Default to scalene
     }
 
     calculateAngles() {
@@ -42,84 +55,69 @@ class Triangle {
         return [angleA, angleB, angleC];
     }
 
-    // Battle-specific methods
-    calculateBattleStats() {
-        return {
-            // Attack power based on perimeter (longer sides = more power)
-            attack: Math.floor(this.getPerimeter() * 2),
-            
-            // Defense based on area (larger area = better defense)
-            defense: Math.floor(this.getArea() * 3),
-            
-            // Speed based on height (taller triangles = faster)
-            speed: Math.floor(this.getHeight() * 4),
-            
-            // Critical hit chance based on whether it's a right triangle
-            criticalChance: this.isRightTriangle() ? 25 : 15,
-            
-            // Special ability based on triangle type
-            specialAbility: this.determineSpecialAbility()
-        };
+    getAngleType() {
+        const angles = this.angles; // Get the angles calculated earlier
+
+        // Classify based on angles
+        const isRight = angles.some(angle => Math.abs(angle - 90) < 1e-10);
+        const isAcute = angles.every(angle => angle < 90);
+        const isObtuse = angles.some(angle => angle > 90);
+
+        if (isRight) return "Right";
+        if (isAcute) return "Acute";
+        if (isObtuse) return "Obtuse";
+
+        return "Unknown"; // Fallback if no classification applies
     }
 
-    determineSpecialAbility() {
-        switch (this.type) {
-            case "Equilateral":
-                return {
-                    name: "Perfect Balance",
-                    effect: "Reduces damage taken by 25%"
-                };
-            case "Isosceles":
-                return {
-                    name: "Twin Strike",
-                    effect: "20% chance to attack twice"
-                };
-            case "Scalene":
-                return {
-                    name: "Unpredictable Edge",
-                    effect: "15% chance to dodge attacks"
-                };
-            default:
-                return {
-                    name: "Basic Strike",
-                    effect: "No special effect"
-                };
-        }
-    }
+    // // Battle-specific methods
+    // calculateBattleStats() {
+    //     return {
+    //         // Attack power based on perimeter (longer sides = more power)
+    //         attack: Math.floor(this.getPerimeter() * 2),
+            
+    //         // Defense based on area (larger area = better defense)
+    //         defense: Math.floor(this.getArea() * 3),
+            
+    //         // Speed based on height (taller triangles = faster)
+    //         speed: Math.floor(this.getHeight() * 4),
+            
+    //         // Critical hit chance based on whether it's a right triangle
+    //         criticalChance: this.isRightTriangle() ? 25 : 15,
+            
+    //         // Special ability based on triangle type
+    //         specialAbility: this.determineSpecialAbility()
+    //     };
+    // }
 
-    // Battle actions
-    attack(target) {
-        let damage = this.battleStats.attack;
-        
-        // Apply critical hit
-        if (Math.random() * 100 < this.battleStats.criticalChance) {
-            damage *= 1.5;
-            console.log("Critical hit!");
-        }
+    // determineSpecialAbility() {
+    //     switch (this.sideType) {
+    //         case "Equilateral":
+    //             return {
+    //                 name: "Perfect Balance",
+    //                 effect: "Reduces damage taken by 25%"
+    //             };
+    //         case "Isosceles":
+    //             return {
+    //                 name: "Twin Strike",
+    //                 effect: "20% chance to attack twice"
+    //             };
+    //         case "Scalene":
+    //             return {
+    //                 name: "Unpredictable Edge",
+    //                 effect: "15% chance to dodge attacks"
+    //             };
+    //         default:
+    //             return {
+    //                 name: "Basic Strike",
+    //                 effect: "No special effect"
+    //             };
+    //     }
+    // }
 
-        // Apply special ability effects
-        if (this.type === "Isosceles" && Math.random() < 0.2) {
-            damage *= 2;
-            console.log("Twin Strike activated!");
-        }
-
-        // Calculate final damage considering target's defense
-        const finalDamage = Math.max(1, Math.floor(damage - (target.battleStats.defense / 4)));
-        return finalDamage;
-    }
+    
 
     takeDamage(amount) {
-        // Apply damage reduction for Equilateral triangles
-        if (this.type === "Equilateral") {
-            amount *= 0.75;
-        }
-        
-        // Apply dodge chance for Scalene triangles
-        if (this.type === "Scalene" && Math.random() < 0.15) {
-            console.log("Attack dodged!");
-            return 0;
-        }
-
         this.health = Math.max(0, this.health - Math.floor(amount));
         return amount;
     }
@@ -148,15 +146,45 @@ class Triangle {
         const x3 = x + b * Math.cos(angleA);
         const y3 = y - b * Math.sin(angleA);
 
-        // Draw triangle with color based on health
+        // Calculate the proportion of the perimeter to draw based on health
+        const healthPercent = this.health / this.maxHealth;
+        const perimeter = this.getPerimeter() * scale;
+        const drawLength = perimeter * healthPercent;
+
+        // Fill the triangle background with blue
+        ctx.fillStyle = "blue";
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
         ctx.lineTo(x3, y3);
         ctx.closePath();
+        ctx.fill();
+
+        // Draw triangle with color based on health
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        
+        // Draw the first side
+        ctx.lineTo(x2, y2);
+        if (drawLength > c * scale) {
+            // Draw the second side
+            ctx.lineTo(x3, y3);
+            if (drawLength > (c + b) * scale) {
+                // Draw the third side
+                ctx.lineTo(x1, y1);
+            } else {
+                // Draw only part of the third side
+                const remainingLength = drawLength - (c * scale + b * scale);
+                const angleB = Math.acos((a ** 2 + c ** 2 - b ** 2) / (2 * a * c));
+                const partialX3 = x2 + remainingLength * Math.cos(angleB);
+                const partialY3 = y2 - remainingLength * Math.sin(angleB);
+                ctx.lineTo(partialX3, partialY3);
+            }
+        }
+
+        ctx.closePath();
 
         // Fill color based on health percentage
-        const healthPercent = this.health / this.maxHealth;
         ctx.fillStyle = `rgb(${255 * (1 - healthPercent)}, ${255 * healthPercent}, 0)`;
         ctx.fill();
         ctx.strokeStyle = "black";
@@ -229,4 +257,5 @@ class Triangle {
             ctx.stroke();
         }
     }
+
 }

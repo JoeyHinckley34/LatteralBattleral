@@ -87,8 +87,12 @@ class ShopManager {
             info.className = 'shape-info';
             info.textContent = `${triangle.type}\n${triangleData.description}`;
 
+
             // Add click handler
-            container.onclick = () => this.buyShape(triangle);
+            container.onclick = () => {
+                console.log("Shape clicked:", triangle); // Log the clicked triangle
+                this.buyShape(triangle);
+            };
 
             // Assemble container
             container.appendChild(canvas);
@@ -105,8 +109,12 @@ class ShopManager {
     buyShape(triangle) {
         if (this.coins >= this.shapeCost) {
             // Create a new instance of the triangle to avoid reference issues
+            console.log("Attempting to buy shape...");
             const purchasedTriangle = new Triangle(...triangle.sides);
-            
+            console.log("Triangle purchased:", purchasedTriangle);
+            purchasedTriangle.setLocation("User");
+            console.log("HELLO??");
+            console.log(purchasedTriangle.location);
             this.coins -= this.shapeCost;
             this.updateCoinDisplay();
             

@@ -5,7 +5,7 @@ class Triangle {
         this.sides = [a, b, c];
         if (!this.isValidTriangle()) {
             throw new Error("Invalid triangle: Side lengths do not satisfy triangle inequality.");
-        }
+        }     
 
         this.type = this.getTriangleType();
         this.angles = this.calculateAngles();
@@ -19,8 +19,20 @@ class Triangle {
         this.position = { x: 0, y: 0 };
         // this.battleStats = this.calculateBattleStats();
         this.isSelected = false;
+
+        this.location = "Shop"; // New member variable to track the triangle's location
+
     }
 
+    setLocation(location) {
+        if (location == "Shop" || location == "User" || location == "Opponent"){
+            this.location = location;
+        }
+        else{
+            console.log("Invalid location")
+        }
+    }
+    
     getHealth() {
         //To do: if taken damage then subtract
         return this.sides[0] + this.sides[1] + this.sides[2];
@@ -70,53 +82,6 @@ class Triangle {
         return "Unknown"; // Fallback if no classification applies
     }
 
-    // // Battle-specific methods
-    // calculateBattleStats() {
-    //     return {
-    //         // Attack power based on perimeter (longer sides = more power)
-    //         attack: Math.floor(this.getPerimeter() * 2),
-            
-    //         // Defense based on area (larger area = better defense)
-    //         defense: Math.floor(this.getArea() * 3),
-            
-    //         // Speed based on height (taller triangles = faster)
-    //         speed: Math.floor(this.getHeight() * 4),
-            
-    //         // Critical hit chance based on whether it's a right triangle
-    //         criticalChance: this.isRightTriangle() ? 25 : 15,
-            
-    //         // Special ability based on triangle type
-    //         specialAbility: this.determineSpecialAbility()
-    //     };
-    // }
-
-    // determineSpecialAbility() {
-    //     switch (this.sideType) {
-    //         case "Equilateral":
-    //             return {
-    //                 name: "Perfect Balance",
-    //                 effect: "Reduces damage taken by 25%"
-    //             };
-    //         case "Isosceles":
-    //             return {
-    //                 name: "Twin Strike",
-    //                 effect: "20% chance to attack twice"
-    //             };
-    //         case "Scalene":
-    //             return {
-    //                 name: "Unpredictable Edge",
-    //                 effect: "15% chance to dodge attacks"
-    //             };
-    //         default:
-    //             return {
-    //                 name: "Basic Strike",
-    //                 effect: "No special effect"
-    //             };
-    //     }
-    // }
-
-    
-
     takeDamage(amount) {
         this.health = Math.max(0, this.health - Math.floor(amount));
         return amount;
@@ -151,8 +116,16 @@ class Triangle {
         const perimeter = this.getPerimeter() * scale;
         const drawLength = perimeter * healthPercent;
 
-        // Fill the triangle background with blue
-        ctx.fillStyle = "blue";
+        // Set the fill color based on the triangle's location
+        if (this.location === "User") {
+            ctx.fillStyle = "green"; // Color for user's team
+        } else if (this.location === "Opponent") {
+            ctx.fillStyle = "red"; // Color for opponent's team
+        } else {
+            ctx.fillStyle = "blue"; // Color for shop
+        }
+        
+        // Fill the triangle background
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
